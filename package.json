@@ -1,0 +1,19 @@
+{
+  "name": "ocr-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bundle.js",
+  "dependencies": {
+    "tesseract.js": "^1.0.10"
+  },
+  "devDependencies": {
+    "gh-pages": "^0.12.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "gh-pages -d build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
