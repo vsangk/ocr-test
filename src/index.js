@@ -1,14 +1,16 @@
 import Tesseract from 'tesseract.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const eng = document.querySelector('.english');
-  const por = document.querySelector('.portuguese');
+  const eng = document.querySelector('.eng');
+  const por = document.querySelector('.por');
   const video = document.querySelector('#video');
   const screenshot = document.querySelector('#screenshot');
   const accessButton = document.querySelector('#access');
   const stopButton = document.querySelector('#stop');
   const captureButton = document.querySelector('#capture');
   const ocrButton = document.querySelector('#ocr');
+  const output = document.querySelector('#output');
+  let currentTarget = document.querySelector('.active');
   let localMediaStream;
   let track;
 
@@ -46,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function snapshot(){
+    document.querySelector('.instructions').style.display = 'none';
+
     const hiddenCanvas = document.querySelector('#canvas');
 
       // Get the exact size of the video element.
@@ -75,16 +79,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (track) { track.stop(); }
   });
 
+  const images = document.querySelectorAll('.ocr-links img');
+  images.forEach(image => image.addEventListener('click', () => {
+    if (currentTarget) {
+      currentTarget.classList.remove('active');
+    }
+    currentTarget = image;
+    currentTarget.classList.add('active');
+  }));
+
+
   ocrButton.addEventListener('click', () => {
-    Tesseract.recognize(screenshot)
-    // .progress(message => console.log(message))
-    .catch(err => console.error(err))
-    .then(result => {
-      const html = result.html;
-      const text = result.text;
-      const div = document.createElement('div');
-      div.innerHTML = text;
-      document.body.append(div);
-    });
+    if (currentTarget) {
+      Tesseract.recognize(currentTarget)
+      .progress(message => { output.innerHTML = 'Loading...'; })
+      .catch(err => console.error(err))
+      .then(result => {
+        const html = result.html;
+        const text = result.text;
+        output.innerHTML = text;
+        // const div = document.createElement('div');
+        // div.innerHTML = text;
+        // document.body.append(div);
+      });
+    }
   });
 });

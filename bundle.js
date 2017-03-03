@@ -3726,14 +3726,16 @@ var _tesseract2 = _interopRequireDefault(_tesseract);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 document.addEventListener('DOMContentLoaded', function () {
-  var eng = document.querySelector('.english');
-  var por = document.querySelector('.portuguese');
+  var eng = document.querySelector('.eng');
+  var por = document.querySelector('.por');
   var video = document.querySelector('#video');
   var screenshot = document.querySelector('#screenshot');
   var accessButton = document.querySelector('#access');
   var stopButton = document.querySelector('#stop');
   var captureButton = document.querySelector('#capture');
   var ocrButton = document.querySelector('#ocr');
+  var output = document.querySelector('#output');
+  var currentTarget = document.querySelector('.active');
   var localMediaStream = void 0;
   var track = void 0;
 
@@ -3768,6 +3770,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function snapshot() {
+    document.querySelector('.instructions').style.display = 'none';
+
     var hiddenCanvas = document.querySelector('#canvas');
 
     // Get the exact size of the video element.
@@ -3799,18 +3803,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  ocrButton.addEventListener('click', function () {
-    _tesseract2.default.recognize(screenshot)
-    // .progress(message => console.log(message))
-    .catch(function (err) {
-      return console.error(err);
-    }).then(function (result) {
-      var html = result.html;
-      var text = result.text;
-      var div = document.createElement('div');
-      div.innerHTML = text;
-      document.body.append(div);
+  var images = document.querySelectorAll('.ocr-links img');
+  images.forEach(function (image) {
+    return image.addEventListener('click', function () {
+      if (currentTarget) {
+        currentTarget.classList.remove('active');
+      }
+      currentTarget = image;
+      currentTarget.classList.add('active');
     });
+  });
+
+  ocrButton.addEventListener('click', function () {
+    if (currentTarget) {
+      _tesseract2.default.recognize(currentTarget).progress(function (message) {
+        output.innerHTML = 'Loading...';
+      }).catch(function (err) {
+        return console.error(err);
+      }).then(function (result) {
+        var html = result.html;
+        var text = result.text;
+        output.innerHTML = text;
+        // const div = document.createElement('div');
+        // div.innerHTML = text;
+        // document.body.append(div);
+      });
+    }
   });
 });
 
